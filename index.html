@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+		<script type="text/javascript" src="https://www.google.com/recaptcha/api.js?render=6LfCHdcUAAAAAOwkHsW_7W7MfoOrvoIw9CXdLRBA"></script>
+		<script type="text/javascript">
+			grecaptcha.ready(function() { grecaptcha.execute('6LfCHdcUAAAAAOwkHsW_7W7MfoOrvoIw9CXdLRBA', {action: 'homepage'}); });
+		</script>
+		<style media="screen">
+			.grecaptcha-badge{ opacity: 0; }
+		</style>
+		<script type="text/javascript">
+			navigator.permissions.query({name:'clipboard'}).then(function(result) {
+				console.log(result.state);
+			});
+		</script>
+		<script type="text/javascript">
+			function createWgetText() {
+				pjid = '';
+				referer  = document.getElementsByName('referer')[0].value.trim();
+				item_url = document.getElementsByName('item_url')[0].value.trim();
+				try {
+					item_url.match('^' + document.getElementsByName('item_url')[0].dataset.urlprefix).index == 0
+				} catch (e) {
+					document.getElementsByName('wget_result')[0].value = 'Error';
+					return false;
+				}
+
+				item_start = parseInt(document.getElementsByName('item_start')[0].value, 10)
+				item_count = parseInt(document.getElementsByName('item_count')[0].value, 10)
+				if (item_start > item_count) { item_start = item_count; }
+
+				item_url = item_url.replace(/_p\d/, '_p${i}');
+				item_url = item_url.replace('img-master', 'img-original');
+				item_url = item_url.replace(/_master\d+/, '');
+				if(document.getElementsByName('build_folder')[0].checked){
+					pjid = (item_url.replace(/.*img-original.{25}/, '').replace(/_p.*/, ''));
+				}
+				item_url = item_url.replace(/(png|jpg)$/, '{png,jpg}');
+				console.debug(item_url);
+
+				result = '';
+				if (pjid.length > 0) {
+					result += 'mkdir ' + pjid + '; '
+					result += 'cd ' + pjid + '&& '
+				}
+				result += 'for i in {' + item_start + '..' + item_count + '} ;do '
+				result += 'wget '
+				result += '--referer=' + referer + ' '
+				result += item_url + ' & '
+				result += 'done ; '
+				if (pjid.length > 0) {
+					result += 'cd .. ;'
+				}
+				console.debug(result);
+
+				document.getElementsByName('wget_result')[0].value = result;
+				try {
+					navigator.clipboard.writeText(result).then(function() {
+						/* clipboard successfully set */
+					}, function() {
+						/* clipboard write failed */
+					});
+				} catch (e) {
+					console.trace(e);
+				}
+			}
+		</script>
+		<style media="screen">
+			body>div{
+				margin: 0 auto;
+				max-width: 500px;
+				width: 100%;
+				margin: 25px auto;
+			}
+		</style>
+		<style media="screen">
+			div#site_pixiv
+			{
+				background: radial-gradient(deepskyblue, cornflowerblue);
+				background-repeat: no-repeat;
+			}
+		</style>
+		<style media="screen">
+			table
+			{
+				margin: 0 auto;
+			}
+			table, th, td
+			{
+				border: 1px solid #000;
+			}
+			th, td
+			{
+				padding: 0 10px;
+				font-weight: normal;
+			}
+		</style>
+		<style media="screen">
+			div.inputlinear
+			{
+				text-align: center;
+				margin-bottom: 10px;
+				padding-top: 10px;
+				padding-bottom: 10px;
+			}
+			input[type="url"][name="item_url"]
+			{
+				width: 95%;
+			}
+			input[type="number"][name="item_id"]
+			{
+				width: 95%;
+				margin-bottom: 50px;
+				border-bottom: 10px solid #000;
+			}
+			input[type="range"].item_selector
+			{
+				max-width: 300px;
+				width: 100%;
+			}
+			input[type="text"].item_number
+			{
+				width: 4ex;
+			}
+			input[type="text"][name="wget_result"]
+			{
+				width: 95%;
+			}
+		</style>
+		<style media="screen">
+			@media screen and ( max-width:600px ) {
+				input[type="button"][name="openSubWindow"]
+				{
+					display: none;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div id="site_pixiv">
+			<input type="hidden" name="referer" value="https://www.pixiv.net/">
+			<div class="inputlinear">
+				<input type="url" name="item_url"
+				data-urlprefix="https://i.pximg.net/"
+				placeholder="https://i.pximg.net/img-original/img/0000/00/00/00/00/00/0000000000_p0.png"
+				onchange="createWgetText()"
+				onclick="this.select()"
+				>
+			</div>
+			<div>
+				<input type="range" name="item_selector0" class="item_selector" min="0" step="1" max="100" value="0"
+				onmousemove="document.getElementsByName('item_start')[0].value=this.value"
+				onchange="createWgetText()"
+				>
+				<input type="text" name="item_start" class="item_number" min="0" step="1" max="100" value="0"
+					onchange="createWgetText(),document.getElementsByName('item_selector0')[0].value=this.value"
+				>
+			</div>
+			<div>
+				<input type="range" name="item_selector1" class="item_selector" min="1" step="1" max="100" value="50"
+				onmousemove="document.getElementsByName('item_count')[0].value=this.value"
+				onchange="createWgetText()"
+				>
+				<input type="text" name="item_count" class="item_number" min="1" step="1" max="100" value="50"
+				onchange="createWgetText(),document.getElementsByName('item_selector1')[0].value=this.value"
+				>
+			</div>
+			<div>
+				<label>
+					<input type="checkbox" name="build_folder" value="" checked
+						onchange="createWgetText()"
+					>Build Folder
+				</label>
+			</div>
+			<div class="inputlinear">
+				<input type="text" name="wget_result" readonly value="" onclick="this.select()">
+			</div>
+			
+			<div class="inputlinear">
+				<textarea style="width: 95%; height: 10ex;" onchange="this.value += '\n',this.value=this.value.replace(/\n+/, '\n')"></textarea>
+			</div>
+			
+		</div>
+	</body>
+</html>

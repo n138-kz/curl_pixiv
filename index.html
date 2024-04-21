@@ -138,6 +138,18 @@
 				}
 			}
 		</style>
+		<script>
+			function insertFavicon(){
+				['icon', 'apple-touch-icon', 'favicon'].forEach((e)=>{
+					let favicon = document.createElement('link');
+					favicon.rel = `${e}`;
+					favicon.href = 'https://www.google.com/s2/favicons?size=64&domain=https://www.pixiv.net/';
+					favicon.type = 'image/webp';
+					document.head.prepend(favicon);
+				});
+			}insertFavicon();
+		</script>
+		
 	</head>
 	<body>
 		<div id="site_pixiv">

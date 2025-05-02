@@ -25,6 +25,11 @@
 					item_url.match('^' + document.getElementsByName('item_url')[0].dataset.urlprefix).index == 0
 				} catch (e) {
 					document.getElementsByName('wget_result')[0].value = 'Error';
+					if (Math.trunc(item_url)>0) {
+						pixiv_url='https://www.pixiv.net/artworks/';
+						pixiv_url+=item_url;
+						document.getElementsByName('wget_result')[0].value+=`: is ${pixiv_url} ?`;
+					}
 					return false;
 				}
 

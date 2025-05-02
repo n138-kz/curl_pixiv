@@ -29,6 +29,11 @@
 						pixiv_url='https://www.pixiv.net/artworks/';
 						pixiv_url+=item_url;
 						document.getElementsByName('wget_result')[0].value+=`: is ${pixiv_url} ?`;
+						pixiv_url_link=document.createElement('a');
+						pixiv_url_link.href=pixiv_url;
+						pixiv_url_link.target='_blank';
+						pixiv_url_link.innerText=pixiv_url;
+						document.getElementsByName('wget_result')[0].after(pixiv_url_link);
 					}
 					return false;
 				}
